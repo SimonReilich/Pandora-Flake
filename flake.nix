@@ -67,7 +67,7 @@
             ];
 
             postInstall = ''
-              install -Dm644 assets/icon.png $out/share/icons/hicolor/256x256/apps/pandora.png
+              install -Dm644 assets/icons/pandora.svg $out/share/icons/hicolor/256x256/apps/pandora.svg
             '';
 
             postFixup = ''
