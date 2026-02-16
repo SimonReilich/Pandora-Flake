@@ -36,7 +36,10 @@
 
             cargoHash = "sha256-e2QZnwv8Wl4rr+4wCTWhJu9Xq8ZFgJ4iArLc7nRLUuM=";
 
-            nativeBuildInputs = with pkgs; [ pkg-config ];
+            nativeBuildInputs = with pkgs; [ 
+              pkg-config 
+              copyDesktopItems
+            ];
 
             buildInputs = with pkgs; [
               openssl
@@ -51,6 +54,21 @@
               libXrandr
               dbus
             ];
+
+            desktopItems = [
+              (pkgs.makeDesktopItem {
+                name = "pandora";
+                exec = "pandora_launcher";
+                icon = "pandora";
+                desktopName = "Pandora Launcher";
+                genericName = "Minecraft Launcher";
+                categories = [ "Game" ];
+              })
+            ];
+
+            postInstall = ''
+              install -Dm644 assets/icon.png $out/share/icons/hicolor/256x256/apps/pandora.png
+            '';
 
             postFixup = ''
               patchelf --add-needed libGL.so.1 $out/bin/pandora_launcher
