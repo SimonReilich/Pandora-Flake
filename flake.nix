@@ -52,8 +52,9 @@
               libXcursor
               libXi
               libXrandr
-              dbusxorg.libXinerama
-              xorg.libXext
+              dbus
+              libXinerama
+              libXext
             ];
 
             desktopItems = [
