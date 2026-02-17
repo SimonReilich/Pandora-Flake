@@ -52,7 +52,8 @@
               libXcursor
               libXi
               libXrandr
-              dbus
+              dbusxorg.libXinerama
+              xorg.libXext
             ];
 
             desktopItems = [
@@ -73,6 +74,8 @@
             postFixup = ''
               patchelf --add-needed libGL.so.1 $out/bin/pandora_launcher
               patchelf --add-needed libvulkan.so.1 $out/bin/pandora_launcher
+              patchelf --add-needed libXinerama.so.1 $out/bin/pandora_launcher
+              patchelf --add-needed libXext.so.6 $out/bin/pandora_launcher
               patchelf --set-rpath "${pkgs.lib.makeLibraryPath buildInputs}" $out/bin/pandora_launcher
             '';
 
