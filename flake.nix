@@ -5,27 +5,72 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   };
 
-  outputs = { self, nixpkgs }:
+  outputs =
+    { self, nixpkgs }:
     let
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" ];
+      supportedSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
     in
     {
-      packages = forAllSystems (system:
+      packages = forAllSystems (
+        system:
         let
           pkgs = import nixpkgs { inherit system; };
 
-          minecraftLibs = pkgs: with pkgs; [
-            stdenv.cc.cc zlib libuuid at-spi2-atk mesa vulkan-loader libGL
-            flite libpulseaudio alsa-lib libogg libvorbis libopus
-            openssl curl expat nss icu fuse3 glib libudev0-shim
-            wayland libxkbcommon pciutils libXrender libXtst
-            xorg.libX11 xorg.libXcursor xorg.libXrandr xorg.libXext 
-            xorg.libXxf86vm xorg.libXi xorg.libXinerama xorg.libXcomposite 
-            xorg.libXdamage xorg.libXfixes xorg.libxcb
-            flac freeglut libjpeg libpng libsamplerate libmikmod 
-            libtheora libtiff pixman speex SDL2
-          ];
+          minecraftLibs =
+            pkgs: with pkgs; [
+              stdenv.cc.cc
+              zlib
+              libuuid
+              at-spi2-atk
+              mesa
+              vulkan-loader
+              libGL
+              flite
+              libpulseaudio
+              alsa-lib
+              libogg
+              libvorbis
+              libopus
+              openssl
+              curl
+              expat
+              nss
+              icu
+              fuse3
+              glib
+              libudev0-shim
+              wayland
+              libxkbcommon
+              pciutils
+              libXrender
+              libXtst
+              libX11
+              libXcursor
+              libXrandr
+              libXext
+              libXxf86vm
+              libXi
+              libXinerama
+              libXcomposite
+              libXdamage
+              libXfixes
+              libxcb
+              flac
+              freeglut
+              libjpeg
+              libpng
+              libsamplerate
+              libmikmod
+              libtheora
+              libtiff
+              pixman
+              speex
+              SDL2
+            ];
 
           pandora-bin = pkgs.rustPlatform.buildRustPackage rec {
             pname = "pandora-launcher-base";
@@ -40,11 +85,25 @@
 
             cargoHash = "sha256-e2QZnwv8Wl4rr+4wCTWhJu9Xq8ZFgJ4iArLc7nRLUuM=";
 
-            nativeBuildInputs = with pkgs; [ pkg-config copyDesktopItems xorg.libxcb xorg.libX11 ];
-            
-            buildInputs = with pkgs; [ 
-               openssl wayland libxkbcommon libGL vulkan-loader 
-               xorg.libX11 xorg.libXcursor xorg.libXi xorg.libXrandr xorg.libxcb dbus
+            nativeBuildInputs = with pkgs; [
+              pkg-config
+              copyDesktopItems
+              libxcb
+              libX11
+            ];
+
+            buildInputs = with pkgs; [
+              openssl
+              wayland
+              libxkbcommon
+              libGL
+              vulkan-loader
+              libX11
+              libXcursor
+              libXi
+              libXrandr
+              libxcb
+              dbus
             ];
 
             desktopItems = [
@@ -73,7 +132,10 @@
         {
           default = pkgs.symlinkJoin {
             name = "pandora-launcher";
-            paths = [ pandora-fhs pandora-bin ];
+            paths = [
+              pandora-fhs
+              pandora-bin
+            ];
 
             meta = with pkgs.lib; {
               description = "Modern Minecraft launcher (FHS Wrapped)";
