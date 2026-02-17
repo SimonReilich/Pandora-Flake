@@ -1,30 +1,34 @@
 {
-  description = "Flake to build PandoraLauncher";
+  description = "Flake to build PandoraLauncher with a contained FHS environment";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   };
 
-  outputs =
-    { self, nixpkgs }:
+  outputs = { self, nixpkgs }:
     let
-      supportedSystems = [
-        "x86_64-linux"
-        "aarch64-linux"
-      ];
+      supportedSystems = [ "x86_64-linux" "aarch64-linux" ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
-      pkgsFor = system: import nixpkgs { inherit system; };
     in
     {
-      packages = forAllSystems (
-        system:
+      packages = forAllSystems (system:
         let
-          pkgs = pkgsFor system;
-        in
-        {
+          pkgs = import nixpkgs { inherit system; };
 
-          default = pkgs.rustPlatform.buildRustPackage rec {
-            pname = "pandora-launcher";
+          minecraftLibs = pkgs: with pkgs; [
+            stdenv.cc.cc zlib libuuid at-spi2-atk mesa vulkan-loader libGL
+            flite libpulseaudio alsa-lib libogg libvorbis libopus
+            openssl curl expat nss icu fuse3 glib libudev0-shim
+            wayland libxkbcommon pciutils libXrender libXtst
+            xorg.libX11 xorg.libXcursor xorg.libXrandr xorg.libXext 
+            xorg.libXxf86vm xorg.libXi xorg.libXinerama xorg.libXcomposite 
+            xorg.libXdamage xorg.libXfixes xorg.libxcb
+            flac freeglut libjpeg libpng libsamplerate libmikmod 
+            libtheora libtiff pixman speex SDL2
+          ];
+
+          pandora-bin = pkgs.rustPlatform.buildRustPackage rec {
+            pname = "pandora-launcher-base";
             version = "2.7.3";
 
             src = pkgs.fetchFromGitHub {
@@ -36,25 +40,11 @@
 
             cargoHash = "sha256-e2QZnwv8Wl4rr+4wCTWhJu9Xq8ZFgJ4iArLc7nRLUuM=";
 
-            nativeBuildInputs = with pkgs; [ 
-              pkg-config 
-              copyDesktopItems
-            ];
-
-            buildInputs = with pkgs; [
-              openssl
-              wayland
-              libxkbcommon
-              libGL
-              vulkan-loader
-              libX11
-              libxcb
-              libXcursor
-              libXi
-              libXrandr
-              dbus
-              libXinerama
-              libXext
+            nativeBuildInputs = with pkgs; [ pkg-config copyDesktopItems xorg.libxcb xorg.libX11 ];
+            
+            buildInputs = with pkgs; [ 
+               openssl wayland libxkbcommon libGL vulkan-loader 
+               xorg.libX11 xorg.libXcursor xorg.libXi xorg.libXrandr xorg.libxcb dbus
             ];
 
             desktopItems = [
@@ -71,17 +61,22 @@
             postInstall = ''
               install -Dm644 assets/icons/pandora.svg $out/share/icons/hicolor/256x256/apps/pandora.svg
             '';
+          };
 
-            postFixup = ''
-              patchelf --add-needed libGL.so.1 $out/bin/pandora_launcher
-              patchelf --add-needed libvulkan.so.1 $out/bin/pandora_launcher
-              patchelf --add-needed libXinerama.so.1 $out/bin/pandora_launcher
-              patchelf --add-needed libXext.so.6 $out/bin/pandora_launcher
-              patchelf --set-rpath "${pkgs.lib.makeLibraryPath buildInputs}" $out/bin/pandora_launcher
-            '';
+          pandora-fhs = pkgs.buildFHSEnv {
+            name = "pandora_launcher";
+            targetPkgs = minecraftLibs;
+            runScript = "${pandora-bin}/bin/pandora_launcher";
+          };
+
+        in
+        {
+          default = pkgs.symlinkJoin {
+            name = "pandora-launcher";
+            paths = [ pandora-fhs pandora-bin ];
 
             meta = with pkgs.lib; {
-              description = "Modern Minecraft launcher";
+              description = "Modern Minecraft launcher (FHS Wrapped)";
               homepage = "https://github.com/Moulberry/PandoraLauncher";
               license = licenses.mit;
               mainProgram = "pandora_launcher";
