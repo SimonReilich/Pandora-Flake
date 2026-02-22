@@ -74,16 +74,16 @@
 
           pandora-bin = pkgs.rustPlatform.buildRustPackage rec {
             pname = "pandora-launcher-base";
-            version = "2.7.3";
+            version = "3.0.0";
 
             src = pkgs.fetchFromGitHub {
               owner = "Moulberry";
               repo = "PandoraLauncher";
               rev = "v${version}";
-              hash = "sha256-pdeKtN/Zv97LGX4bscR8DwNzHx/Yk15ckDM7MP7oDgg=";
+              hash = "sha256-/sfY2iJbNTnV+TrBzp9UvBqi9Jo9JEWFw1zV5m1ygEQ=";
             };
 
-            cargoHash = "sha256-e2QZnwv8Wl4rr+4wCTWhJu9Xq8ZFgJ4iArLc7nRLUuM=";
+            cargoHash = "sha256-mBW0rCqs571eN7nApVV1Krpu48D49eMr4TMrBz0EYZc=";
 
             nativeBuildInputs = with pkgs; [
               pkg-config
