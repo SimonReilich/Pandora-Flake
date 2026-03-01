@@ -3,15 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
-    repo = {
-      url = "github:Moulberry/PandoraLauncher";
-      flake = false;
-    };
   };
 
   outputs =
-    { self, nixpkgs, repo }:
+    { self, nixpkgs }:
     let
       supportedSystems = [
         "x86_64-linux"
@@ -79,9 +74,14 @@
 
           pandora-bin = pkgs.rustPlatform.buildRustPackage rec {
             pname = "pandora-launcher-base";
-            version = "3.1.0";
+            version = "3.0.0";
 
-            src = repo;
+            src = pkgs.fetchFromGitHub {
+              owner = "Moulberry";
+              repo = "PandoraLauncher";
+              rev = "v${version}";
+              hash = "sha256-/sfY2iJbNTnV+TrBzp9UvBqi9Jo9JEWFw1zV5m1ygEQ=";
+            };
 
             cargoHash = "sha256-mBW0rCqs571eN7nApVV1Krpu48D49eMr4TMrBz0EYZc=";
 
