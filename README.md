@@ -1,0 +1,1 @@
+Since there seems to be a persistent issue with the rust ui library that was not fixed for some time, please use https://github.com/SimonReilich/PandoraLauncher-Flake-Wrapper which wraps the portable version of the launcher
